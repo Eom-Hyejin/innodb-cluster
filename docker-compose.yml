@@ -1,0 +1,66 @@
+version: '3'
+services:
+  innodb1:
+    image: hihyejin/innodb-shell:20.04
+    container_name: innodb1
+    networks:
+      - innodb
+    cap_add:
+      - SYS_NICE
+    stdin_open: true # -i 옵션 추가
+    tty: true # -t 옵션 추가
+    volumes:
+      - /innodb_cluster/cnf/my1.cnf:/etc/my.cnf
+      - /innodb_cluster/init-cluster.sh:/init-cluster.sh
+    command: /mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf --user=mysql &
+
+  innodb2:
+    image: hihyejin/innodb:20.04
+    container_name: innodb2
+    networks:
+      - innodb
+    cap_add:
+      - SYS_NICE
+    stdin_open: true 
+    tty: true
+    volumes:
+      - /innodb_cluster/cnf/my2.cnf:/etc/my.cnf
+    command: bash -c "rm -rf /mysql_data/data/auto.cnf && /mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf --user=mysql"
+
+  innodb3:
+    image: hihyejin/innodb:20.04
+    container_name: innodb3
+    networks:
+      - innodb
+    cap_add:
+      - SYS_NICE
+    stdin_open: true 
+    tty: true
+    volumes:
+      - /innodb_cluster/cnf/my3.cnf:/etc/my.cnf
+    command: bash -c "rm -rf /mysql_data/data/auto.cnf && /mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf --user=mysql"
+
+  router: 
+    image: mysql/mysql-router
+    container_name: router
+    environment:
+      MYSQL_HOST: innodb1
+      MYSQL_PORT: 3306
+      MYSQL_USER: shell
+      MYSQL_PASSWORD: shell
+      MYSQL_INNODB_CLUSTER_MEMBERS: 3
+    networks:
+      - innodb
+    restart: on-failure
+    depends_on:
+      - innodb1
+      - innodb2
+      - innodb3
+    stdin_open: false
+    tty: false
+
+networks:
+  innodb:
+    driver: bridge
+    name: innodb
+

@@ -1,0 +1,164 @@
+
+[client]
+port          = 3306
+socket        = /tmp/mysql.sock
+#default-character-set = utf8
+
+[mysqld]
+user          = mysql
+port          = 3306
+socket        = /tmp/mysql.sock
+
+basedir	      = /mysql
+datadir	      = /mysql_data/data
+tmpdir          = /tmp
+
+
+## CHARACTER SET
+character-set-server = utf8
+collation-server=utf8_general_ci
+init_connect="set names utf8"
+init_connect = "set collation_connection=utf8_general_ci"
+
+
+## AUTHENTICATION
+#default_authentication_plugin = mysql_native_password
+
+
+## LOGGING CONFIG
+log_error = /mysql_data/log/mysql.err
+slow_query_log_file = /mysql_data/log/mysql-slow.log
+slow_query_log = 1
+#long_query_time = 5
+long_query_time = 10
+general_log = 0
+#general_log_file = /mysql_data/log/general-log.log
+log_timestamps = SYSTEM
+
+
+## SYSTEM CONFIG
+back_log = 50
+max_connections = 1000
+max_connect_errors = 10
+thread_cache_size = 8
+
+
+sort_buffer_size = 1M
+join_buffer_size = 1M
+read_buffer_size = 1M
+read_rnd_buffer_size = 2M
+
+max_allowed_packet = 1G
+table_open_cache = 2000
+
+max_heap_table_size = 16M
+tmp_table_size = 16M
+
+#wait_timeout = 3600
+wait_timeout = 28800
+interactive_timeout = 28800
+
+lower_case_table_names = 1 ##대소문자 구분 X
+log_bin_trust_function_creators = 1
+
+explicit_defaults_for_timestamp = 1
+
+skip-name-resolve
+skip-external-locking
+
+
+## TRANSACTION ISOLATION CONFIG
+transaction-isolation = REPEATABLE-READ
+
+
+######################################
+# Replication Master Server (default)#
+######################################
+server-id              = 3
+#slave-skip-errors = all
+# binary logging is required for replication
+log-bin = /mysql_data/log/mysql-bin
+binlog_format = row
+#expire_logs_days = 3
+#3days for binlog_expire_logs_seconds
+#binlog_expire_logs_seconds = 259200
+binlog_expire_logs_seconds = 604800   ## 7 days
+max_binlog_size = 1G
+
+#relay_log = /mysql_data/log/relay-bin
+#relay_log_index = /mysql_data/log/relay-bin.index
+#read_only
+############################
+
+
+#################
+# MyISAM option #
+#################
+
+key_buffer_size = 32M
+#bulk_insert_buffer_size = 64M
+#myisam_sort_buffer_size = 128M
+#myisam_max_sort_file_size = 256G
+
+
+#################
+# innodb option #
+#################
+
+default-storage-engine = innodb
+innodb_buffer_pool_size = 1G
+innodb_data_file_path = ibdata1:1G;ibdata2:1G;ibdata3:10M:autoextend
+innodb_data_home_dir = /mysql_data/data
+
+innodb_flush_log_at_trx_commit = 1
+innodb_log_buffer_size = 8M
+# Set .._log_file_size to 25 % of buffer pool size
+innodb_log_file_size = 512M
+innodb_log_files_in_group = 3
+innodb_log_group_home_dir = /mysql_data/data
+
+innodb_flush_method=O_DIRECT
+#innodb_thread_concurrency --> the number of cpu core * 2
+innodb_thread_concurrency = 0
+innodb_max_dirty_pages_pct = 90
+
+innodb_lock_wait_timeout = 50
+innodb_buffer_pool_instances = 8
+#innodb_read_io/write_io_threads --> the number of cpu core / 2
+innodb_read_io_threads = 2
+innodb_write_io_threads = 2
+#innodb_force_recovery = 5
+
+
+#################
+# innodb cluster #
+#################
+gtid_mode = ON
+enforce_gtid_consistency = ON
+master-info-repository = TABLE
+relay-log-info-repository = TABLE
+log_slave_updates = ON
+disabled_storage_engines="MyISAM,BLACKHOLE,FEDERATED,ARCHIVE,MEMORY"
+binlog_transaction_dependency_tracking = WRITESET
+
+plugin_load_add='group_replication.so'
+group_replication_group_name = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+group_replication_start_on_boot = OFF
+loose-group_replication_local_address = "innodb3:13306" 
+loose-group_replication_group_seeds = "innodb1:13306,innodb2:13306,innodb3:13306" 
+group_replication_bootstrap_group = OFF
+
+[mysqldump]
+quick
+max_allowed_packet = 1G
+
+[mysql]
+no-auto-rehash
+
+
+[mysqlhotcopy]
+interactive-timeout
+
+[mysqld_safe]
+#open-files-limit = 4096
+
