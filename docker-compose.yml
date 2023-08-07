@@ -15,7 +15,7 @@ services:
     command: /mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf --user=mysql &
 
   innodb2:
-    image: hihyejin/innodb:20.04
+    image: hihyejin/innodb-db:20.04
     container_name: innodb2
     networks:
       - innodb
@@ -28,7 +28,7 @@ services:
     command: bash -c "rm -rf /mysql_data/data/auto.cnf && /mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf --user=mysql"
 
   innodb3:
-    image: hihyejin/innodb:20.04
+    image: hihyejin/innodb-db:20.04
     container_name: innodb3
     networks:
       - innodb
