@@ -11,7 +11,7 @@ services:
     tty: true # -t 옵션 추가
     volumes:
       - /innodb-cluster/cnf/my1.cnf:/etc/my.cnf
-      - /innodb-cluster/init-cluster.sh:/init-cluster.sh
+      - /innodb-cluster/scripts:/scripts
     command: /mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf --user=mysql &
 
   innodb2:
@@ -25,6 +25,7 @@ services:
     tty: true
     volumes:
       - /innodb-cluster/cnf/my2.cnf:/etc/my.cnf
+      - /innodb-cluster/scripts/reset.sh:/reset.sh
     command: bash -c "rm -rf /mysql_data/data/auto.cnf && /mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf --user=mysql"
 
   innodb3:
@@ -38,6 +39,7 @@ services:
     tty: true
     volumes:
       - /innodb-cluster/cnf/my3.cnf:/etc/my.cnf
+      - /innodb-cluster/scripts/reset.sh:/reset.sh
     command: bash -c "rm -rf /mysql_data/data/auto.cnf && /mysql/bin/mysqld_safe --defaults-file=/etc/my.cnf --user=mysql"
 
   router: 
